@@ -30,21 +30,25 @@ class CoffeCart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
             onTap: () {
               Navigator.of(
                 context,
               ).pushNamed(RouteGenerator.coffepage, arguments: coffe);
             },
-            child: Container(
-              height: 130,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.contain,
-                  image: AssetImage(coffe['image']),
+           
+              child: Container(
+                height: 130,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.contain,
+                    image: AssetImage(coffe['image']),
+                  ),
                 ),
               ),
             ),
-          ),
+         
           const SizedBox(height: 10),
           Text(
             coffe['name'],
@@ -69,6 +73,7 @@ class CoffeCart extends StatelessWidget {
               ),
               Consumer<CartProvider>(builder: (context, cart, child) {
                 return IconButton(
+                  highlightColor: const Color.fromARGB(255, 125, 57, 15),
                   iconSize: 20,
                   onPressed: () {
                     cart.addCoffee(coffe);

@@ -1,20 +1,24 @@
+import 'package:coffeshop/models/hero.dart';
 import 'package:coffeshop/routes/athenticate.dart';
+import 'package:coffeshop/widgets/getstartedslider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 // ignore: camel_case_types
 class herosection extends StatefulWidget {
   const herosection({super.key});
 
   @override
-  State<herosection> createState() => _herosectionState();
+  State<herosection> createState() => _HerosectionState();
 }
 
-class _herosectionState extends State<herosection> {
-  bool showLogin = false;
+class _HerosectionState extends State<herosection> {
   @override
   Widget build(BuildContext context) {
-    return showLogin
+    HeroModel heroModel = Provider.of<HeroModel>(context);
+
+    return heroModel.showLogin
         ? const Authenticate()
         : Scaffold(
             body: Container(
@@ -34,10 +38,19 @@ class _herosectionState extends State<herosection> {
                   const SizedBox(
                     height: 150,
                   ),
-                  Text(
-                    'Coffee shop',
-                    style:
-                        GoogleFonts.pacifico(fontSize: 45, color: Colors.white),
+                  TweenAnimationBuilder(
+                    duration: const Duration(milliseconds: 1000),
+                    tween: Tween<double>(begin: 0, end: 1),
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Text(
+                          'Coffee shop',
+                          style: GoogleFonts.pacifico(
+                              fontSize: 45 * value, color: Colors.white),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 470,
@@ -52,25 +65,7 @@ class _herosectionState extends State<herosection> {
                   const SizedBox(
                     height: 70,
                   ),
-                  TextButton(
-                      onPressed: () {
-                        setState(() {
-                          showLogin = true;
-                        });
-                      },
-                      style: TextButton.styleFrom(
-                          backgroundColor: Colors.amber[900],
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 35, vertical: 18),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10))),
-                      child: const Text(
-                        'Get Start',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold),
-                      )),
+                  GetStartedSlider(model: heroModel)
                 ],
               ),
             ),

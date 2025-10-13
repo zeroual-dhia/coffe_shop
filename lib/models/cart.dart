@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<Map<String, dynamic>> _coffees = [];
-
   List<Map<String, dynamic>> get selectedItems => List.unmodifiable(_coffees);
+
+ 
 
   int get totalPrice {
     int total = 0;
@@ -13,7 +14,7 @@ class CartProvider extends ChangeNotifier {
     return total;
   }
 
-  void addCoffee( coffee) {
+  void addCoffee(coffee) {
     final index = _coffees.indexWhere((c) => c['id'] == coffee['id']);
 
     if (index != -1) {

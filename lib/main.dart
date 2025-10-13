@@ -1,5 +1,6 @@
 import 'package:coffeshop/models/cart.dart';
 import 'package:coffeshop/models/coffee.dart';
+import 'package:coffeshop/models/hero.dart';
 import 'package:coffeshop/models/navigation.dart';
 import 'package:coffeshop/models/showregister.dart';
 import 'package:coffeshop/models/user.dart';
@@ -24,7 +25,8 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => Showregister()),
-        ChangeNotifierProvider(create: (_) => CartProvider())
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => HeroModel()),
       ],
       child: const MyApp(),
     ),

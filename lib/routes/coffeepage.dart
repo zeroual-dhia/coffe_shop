@@ -19,12 +19,14 @@ class Coffeepage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
+                    highlightColor: Colors.transparent,
                     onTap: () {
                       Navigator.of(context).pop();
                     },
                     child: const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.grey,
+                      size: 30,
                     )),
                 const SizedBox(
                   height: 30,
@@ -111,11 +113,13 @@ class Coffeepage extends StatelessWidget {
                   children: [
                     Consumer<CartProvider>(
                       builder: (context, cart, child) => InkWell(
+                        splashColor: const Color(0xffe57734).withAlpha(200),
+                        highlightColor: const Color(0xffe57734).withAlpha(100),
                         borderRadius: BorderRadius.circular(18),
                         onTap: () {
                           cart.addCoffee(coffe);
                         },
-                        child: Container(
+                        child: Ink(
                           decoration: BoxDecoration(
                               color: const Color.fromARGB(255, 50, 54, 56),
                               borderRadius: BorderRadius.circular(18)),

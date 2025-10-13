@@ -22,23 +22,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _textController = TextEditingController();
   String toSearch = "";
+  final Map<String, List> _coffeeCache = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 7, vsync: this);
-    _tabController.addListener(_handleTabSelection);
-  }
-
-  _handleTabSelection() {
-    if (_tabController.indexIsChanging) {
-      setState(() {});
-    }
+    // Remove the listener that causes rebuilds
+    // _tabController.addListener(_handleTabSelection);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -63,6 +60,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           actions: [
             InkWell(
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
               onTap: () => Navigator.pushNamed(context, RouteGenerator.profile),
               child: const Icon(Icons.person, size: 35, color: Colors.grey),
             ),
@@ -99,6 +98,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildMainBody() {
+    print("main running");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -159,14 +159,34 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         Expanded(
           child: TabBarView(
             controller: _tabController,
+            physics: const BouncingScrollPhysics(),
             children: [
-              _buildTabContent("all", toSearch),
-              _buildTabContent("Milk-Based", toSearch),
-              _buildTabContent("Strong", toSearch),
-              _buildTabContent("Classic", toSearch),
-              _buildTabContent("Cold", toSearch),
-              _buildTabContent("Chocolate-Based", toSearch),
-              _buildTabContent("Dessert", toSearch),
+              _TabContent(
+                  coffeeType: "all", toSearch: toSearch, onFetch: _fetchCoffee),
+              _TabContent(
+                  coffeeType: "Milk-Based",
+                  toSearch: toSearch,
+                  onFetch: _fetchCoffee),
+              _TabContent(
+                  coffeeType: "Strong",
+                  toSearch: toSearch,
+                  onFetch: _fetchCoffee),
+              _TabContent(
+                  coffeeType: "Classic",
+                  toSearch: toSearch,
+                  onFetch: _fetchCoffee),
+              _TabContent(
+                  coffeeType: "Cold",
+                  toSearch: toSearch,
+                  onFetch: _fetchCoffee),
+              _TabContent(
+                  coffeeType: "Chocolate-Based",
+                  toSearch: toSearch,
+                  onFetch: _fetchCoffee),
+              _TabContent(
+                  coffeeType: "Dessert",
+                  toSearch: toSearch,
+                  onFetch: _fetchCoffee),
             ],
           ),
         ),
@@ -174,9 +194,58 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildTabContent(String coffeeType, String toSearch) {
+  Future<List> _fetchCoffee(String coffeeType) async {
+    if (_coffeeCache.containsKey(coffeeType)) {
+      return _coffeeCache[coffeeType]!;
+    }
+
+    try {
+      final url = coffeeType == "all"
+          ? 'http://172.20.10.2:3001/coffee'
+          : 'http://172.20.10.2:3001/coffee?type=$coffeeType';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as List;
+        _coffeeCache[coffeeType] = data;
+        return data;
+      } else {
+        throw Exception(
+            'Failed to load data - Status Code: ${response.statusCode}');
+      }
+    } catch (_) {
+      throw Exception("Failed to load data");
+    }
+  }
+}
+
+class _TabContent extends StatefulWidget {
+  final String coffeeType;
+  final String toSearch;
+  final Future<List> Function(String) onFetch;
+
+  const _TabContent({
+    required this.coffeeType,
+    required this.toSearch,
+    required this.onFetch,
+  });
+
+  @override
+  State<_TabContent> createState() => _TabContentState();
+}
+
+class _TabContentState extends State<_TabContent>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    print("TabContent building: ${widget.coffeeType}");
+
     return FutureBuilder(
-      future: _fetchCoffee(coffeeType),
+      future: widget.onFetch(widget.coffeeType),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -186,8 +255,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   style: TextStyle(color: Colors.white)));
         } else {
           List coffeeList = snapshot.data as List;
-          if (toSearch.isNotEmpty) {
-            RegExp regex = RegExp('^$toSearch', caseSensitive: false);
+          if (widget.toSearch.isNotEmpty) {
+            RegExp regex = RegExp('^${widget.toSearch}', caseSensitive: false);
             coffeeList = coffeeList
                 .where((item) => regex.hasMatch(item['name']))
                 .toList();
@@ -210,23 +279,5 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         }
       },
     );
-  }
-
-  Future<List> _fetchCoffee(String coffeeType) async {
-    try {
-      final url = coffeeType == "all"
-          ? 'http://192.168.100.2:3000/coffee'
-          : 'http://192.168.100.2:3000/coffee?type=$coffeeType';
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception(
-            'Failed to load data - Status Code: ${response.statusCode}');
-      }
-    } catch (_) {
-      throw Exception("Failed to load data");
-    }
   }
 }
