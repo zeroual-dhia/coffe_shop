@@ -201,8 +201,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     try {
       final url = coffeeType == "all"
-          ? 'http://172.20.10.2:3001/coffee'
-          : 'http://172.20.10.2:3001/coffee?type=$coffeeType';
+          ? 'http://172.20.10.2:3000/coffee'
+          : 'http://172.20.10.2:3000/coffee?type=$coffeeType';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {

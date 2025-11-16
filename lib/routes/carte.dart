@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cart.dart';
+import 'package:quickalert/quickalert.dart';
 
 class Cart extends StatefulWidget {
   const Cart({super.key});
@@ -45,10 +46,18 @@ class _CartState extends State<Cart> {
                 width: 30,
               ),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.success,
+                        title: 'Success!',
+                        text: 'Your order is confirmed ☕',
+                        confirmBtnColor: const Color.fromRGBO(255, 111, 0, 1),
+                        showCancelBtn: false);
+                  },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    backgroundColor: Colors.amber[900],
+                    backgroundColor: const Color.fromRGBO(255, 111, 0, 1),
                   ),
                   child: const Text(
                     'BUY',
